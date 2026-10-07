@@ -16,7 +16,7 @@
   --nav-r: 1rem;
   --nav-cell-r: calc(var(--nav-r) - var(--nav-pad));
   --nav-inset: calc(var(--nav-pad) + 1rem);
-  --nav-gutter: clamp(0.75rem, 2vw, 1.5rem);
+  --nav-gutter: var(--gutter);
   /* Hairline that keeps the dark blocks readable as shapes over dark sections. */
   --nav-edge: inset 0 0 0 1px color-mix(in oklch, var(--paper) 10%, transparent);
 
@@ -168,65 +168,20 @@
     calc((var(--last) - var(--i)) * 25ms);
 }
 
-/* Call to action */
+/* Call to action: a block button (see BlockButton.css) with the nav's own placement. */
 
 .nav-cta {
-  position: relative;
-  isolation: isolate;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  height: var(--nav-h);
   margin-left: auto;
-  padding-inline: 1.25rem;
-  overflow: hidden;
-  border-radius: var(--nav-r);
-  background: var(--violet);
-  color: var(--paper);
   box-shadow: var(--nav-edge);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
-  -webkit-tap-highlight-color: transparent;
-  transition: scale 160ms var(--ease-out-quart);
+  /* The lean toward the pointer. Custom properties, so it never collides with the press scale. */
+  translate: var(--mx, 0px) var(--my, 0px);
 }
 
-/* Ink floods the block from wherever the pointer came in, and drains to where it left. */
-.nav-cta::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: var(--fy, 50%);
-  left: var(--fx, 50%);
-  width: 260%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--ink);
-  translate: -50% -50%;
-  scale: 0;
-  transition: scale 560ms var(--ease-out-expo);
-}
-
-.nav-cta:active {
-  scale: 0.97;
-}
-
-.nav-arrow {
-  width: 0.6875rem;
-  height: 0.6875rem;
-  flex: none;
-  transition: translate 320ms var(--ease-out-expo);
-}
-
-@media (hover: hover) {
-  .nav-cta:hover::before {
-    scale: 1;
-  }
-
-  .nav-cta:hover .nav-arrow {
-    translate: 0.125rem -0.125rem;
-  }
+/* Over a violet section the button would vanish, so it turns ink there. */
+.nav[data-tone="violet"] .nav-cta {
+  --btn-bg: var(--ink);
+  --btn-flood: var(--paper);
+  --btn-flood-fg: var(--ink);
 }
 
 /* Menu button, small screens only */
@@ -424,7 +379,7 @@
   scale: 0.98;
 }
 
-.nav-menu__cta .nav-arrow {
+.nav-menu__cta .arrow {
   width: 0.875rem;
   height: 0.875rem;
 }
@@ -451,7 +406,7 @@
 }
 
 @media (width < 22.5rem) {
-  .nav-cta .nav-arrow {
+  .nav-cta .arrow {
     display: none;
   }
 }
@@ -466,9 +421,6 @@
 
   .nav-skip,
   .nav-cell,
-  .nav-cta,
-  .nav-cta::before,
-  .nav-arrow,
   .nav-menu-btn,
   .nav-menu__link::before,
   .nav-menu__cta {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Gabarito, Geist_Mono } from "next/font/google";
+import PointerOrigin from "@/components/PointerOrigin";
 import SiteNav from "@/components/SiteNav";
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <SiteNav />
+        <PointerOrigin />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

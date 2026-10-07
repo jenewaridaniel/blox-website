@@ -1,0 +1,105 @@
+/*
+ * Block button, shared by the nav and the page sections. Its fill floods in
+ * from wherever the pointer crossed the edge (PointerOrigin.tsx writes that
+ * point to --fx / --fy) and drains back to where the pointer left.
+ */
+
+.block-btn {
+  --btn-bg: var(--violet);
+  --btn-fg: var(--paper);
+  --btn-flood: var(--ink);
+  --btn-flood-fg: var(--paper);
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3.5rem;
+  padding-inline: 1.25rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    scale 160ms var(--ease-out-quart),
+    color 260ms var(--ease-out-quart),
+    background-color 260ms var(--ease-out-quart);
+}
+
+.block-btn[data-tone="paper"] {
+  --btn-bg: var(--paper);
+  --btn-fg: var(--ink);
+}
+
+.block-btn[data-tone="ink"] {
+  --btn-bg: var(--ink);
+  --btn-flood: var(--paper);
+  --btn-flood-fg: var(--ink);
+}
+
+/* The quieter partner to a paper button on a violet surface. */
+.block-btn[data-tone="deep"] {
+  --btn-bg: var(--violet-deep);
+  --btn-flood: var(--paper);
+  --btn-flood-fg: var(--ink);
+}
+
+.block-btn::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: var(--fy, 50%);
+  left: var(--fx, 50%);
+  width: 260%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--btn-flood);
+  translate: -50% -50%;
+  scale: 0;
+  transition: scale 560ms var(--ease-out-expo);
+}
+
+.block-btn:active {
+  scale: 0.97;
+}
+
+.block-btn:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 0;
+  box-shadow: 0 0 0 5px var(--ink);
+}
+
+.arrow {
+  flex: none;
+  width: 0.6875rem;
+  height: 0.6875rem;
+  transition: translate 320ms var(--ease-out-expo);
+}
+
+@media (hover: hover) {
+  .block-btn:hover {
+    color: var(--btn-flood-fg);
+  }
+
+  .block-btn:hover::before {
+    scale: 1;
+  }
+
+  .block-btn:hover .arrow {
+    translate: 0.125rem -0.125rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .block-btn,
+  .block-btn::before,
+  .arrow {
+    transition-duration: 0.01ms;
+  }
+}

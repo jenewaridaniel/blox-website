@@ -5,8 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { isCurrent, navCta, navItems } from "@/lib/nav";
+import Arrow from "@/components/Arrow";
 import BloxWordmark from "@/components/BloxWordmark";
-import NavMenu, { NavArrow } from "@/components/NavMenu";
+import NavMenu from "@/components/NavMenu";
 
 type Rect = { l: number; r: number };
 type Scrub = { id: number; x: number; index: number; active: boolean };
@@ -19,7 +20,7 @@ export default function SiteNav() {
   const blox = useRef<HTMLSpanElement>(null);
   const logo = useRef<HTMLAnchorElement>(null);
   const cta = useRef<HTMLAnchorElement>(null);
-  const restAt = useRef<(index: number) => void>(null);
+  const onRoute = useRef<(rest: number) => void>(null);
 
   const current = navItems.findIndex((item) => isCurrent(pathname, item.href));
   // Pages outside the nav leave the blox on the logo.
@@ -143,6 +144,7 @@ export default function SiteNav() {
     let lastY = window.scrollY;
     let travel = 0;
     const onScroll = () => {
+      readTone();
       const y = window.scrollY;
       const delta = y - lastY;
       lastY = y;
@@ -260,50 +262,67 @@ export default function SiteNav() {
     };
     const onDragStart = (event: DragEvent) => event.preventDefault();
 
-    // The call to action leans toward the pointer and remembers where it came in and went out.
+    // The call to action leans toward the pointer.
     let ctaBox = ctaEl.getBoundingClientRect();
-    const flood = (event: PointerEvent) => {
-      ctaEl.style.setProperty("--fx", `${event.clientX - ctaBox.left}px`);
-      ctaEl.style.setProperty("--fy", `${event.clientY - ctaBox.top}px`);
-    };
-    const onCtaEnter = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse") return;
-      ctaBox = ctaEl.getBoundingClientRect();
-      flood(event);
+    const lean = (x: number, y: number, duration: number, ease: string) =>
+      gsap.to(ctaEl, {
+        "--mx": `${x}px`,
+        "--my": `${y}px`,
+        duration,
+        ease,
+        overwrite: "auto",
+      });
+    gsap.set(ctaEl, { "--mx": "0px", "--my": "0px" });
+    const onCtaEnter = () => {
+      const box = ctaEl.getBoundingClientRect();
+      const style = getComputedStyle(ctaEl);
+      // Measure the button where it rests, not where it has leaned to.
+      ctaBox = new DOMRect(
+        box.left - parseFloat(style.getPropertyValue("--mx")),
+        box.top - parseFloat(style.getPropertyValue("--my")),
+        box.width,
+        box.height,
+      );
     };
     const onCtaMove = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || reduce.matches) return;
-      gsap.to(ctaEl, {
-        x: (event.clientX - ctaBox.left - ctaBox.width / 2) * 0.12,
-        y: (event.clientY - ctaBox.top - ctaBox.height / 2) * 0.2,
-        duration: 0.5,
-        ease: "power3.out",
-        overwrite: "auto",
-      });
+      lean(
+        (event.clientX - ctaBox.left - ctaBox.width / 2) * 0.12,
+        (event.clientY - ctaBox.top - ctaBox.height / 2) * 0.2,
+        0.5,
+        "power3.out",
+      );
     };
-    const onCtaLeave = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse") return;
-      flood(event);
-      gsap.to(ctaEl, {
-        x: 0,
-        y: 0,
-        duration: dur(0.7),
-        ease: "expo.out",
-        overwrite: "auto",
-      });
-    };
+    const onCtaLeave = () => lean(0, 0, dur(0.7), "expo.out");
 
     const onWide = () => {
       if (wide.matches) setMenuOpen(false);
     };
 
-    restAt.current = (index) => {
+    // Sections say what colour they put behind the nav (data-nav-tone) so the call to action can stay visible.
+    const readTone = () => {
+      const line = headerEl.offsetHeight / 2;
+      let tone = "";
+      document
+        .querySelectorAll<HTMLElement>("[data-nav-tone]")
+        .forEach((zone) => {
+          const box = zone.getBoundingClientRect();
+          if (box.top <= line && box.bottom >= line)
+            tone = zone.dataset.navTone ?? "";
+        });
+      if (headerEl.dataset.tone !== tone) headerEl.dataset.tone = tone;
+    };
+    readTone();
+
+    onRoute.current = (index) => {
+      readTone();
       if (index === home) return;
       home = index;
       if (!scrub) slide();
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", readTone);
     wide.addEventListener("change", onWide);
     trayEl.addEventListener("pointerover", onOver);
     trayEl.addEventListener("pointerleave", onLeave);
@@ -320,10 +339,11 @@ export default function SiteNav() {
     ctaEl.addEventListener("pointerleave", onCtaLeave);
 
     return () => {
-      restAt.current = null;
+      onRoute.current = null;
       observer.disconnect();
       gsap.killTweensOf(edges);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", readTone);
       wide.removeEventListener("change", onWide);
       trayEl.removeEventListener("pointerover", onOver);
       trayEl.removeEventListener("pointerleave", onLeave);
@@ -342,8 +362,8 @@ export default function SiteNav() {
   }, []);
 
   useEffect(() => {
-    restAt.current?.(rest);
-  }, [rest]);
+    onRoute.current?.(rest);
+  }, [rest, pathname]);
 
   return (
     <header ref={header} className="nav">
@@ -386,9 +406,9 @@ export default function SiteNav() {
           </ul>
         </div>
 
-        <Link ref={cta} href={navCta.href} className="nav-cta">
+        <Link ref={cta} href={navCta.href} className="block-btn nav-cta">
           {navCta.label}
-          <NavArrow />
+          <Arrow />
         </Link>
 
         <button

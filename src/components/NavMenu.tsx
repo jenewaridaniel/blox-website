@@ -4,6 +4,7 @@ import { useRef, type RefObject } from "react";
 import Link from "next/link";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { isCurrent, navCta, navItems } from "@/lib/nav";
+import Arrow from "@/components/Arrow";
 import BloxWordmark from "@/components/BloxWordmark";
 
 type Props = {
@@ -13,25 +14,6 @@ type Props = {
   origin: RefObject<HTMLElement | null>;
   onDismiss: () => void;
 };
-
-export function NavArrow() {
-  return (
-    <svg
-      className="nav-arrow"
-      viewBox="0 0 11 11"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M1.5 9.5 9.5 1.5M3 1.5h6.5V8"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 export default function NavMenu({ open, pathname, origin, onDismiss }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -204,7 +186,7 @@ export default function NavMenu({ open, pathname, origin, onDismiss }: Props) {
       <div className="nav-menu__foot">
         <Link href={navCta.href} className="nav-menu__cta" onClick={onDismiss}>
           {navCta.label}
-          <NavArrow />
+          <Arrow />
         </Link>
         <p className="nav-menu__tag">Naira and crypto. One simple app.</p>
       </div>

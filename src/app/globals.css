@@ -1,14 +1,21 @@
 @import "tailwindcss";
+@import "../components/BlockButton.css" layer(components);
 @import "../components/SiteNav.css" layer(components);
+@import "../components/Hero.css" layer(components);
 
 :root {
   /* Brand v5: violet #7B2CFF and ink #0E0B14. Paper is a white tinted toward the violet. */
   --violet: oklch(0.544 0.2759 290.83);
   --ink: oklch(0.1581 0.0193 299.48);
   --paper: oklch(0.985 0.006 295);
+  /* Violet pushed toward ink: quiet blocks that sit on a violet surface. */
+  --violet-deep: color-mix(in oklch, var(--ink) 28%, var(--violet));
 
   --background: var(--paper);
   --foreground: var(--ink);
+
+  /* Space between the viewport edge and the blocks that sit against it. */
+  --gutter: clamp(0.75rem, 2vw, 1.5rem);
 
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
