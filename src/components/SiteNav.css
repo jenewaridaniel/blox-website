@@ -1,0 +1,478 @@
+/*
+ * Site nav. An ink tray of cells and one violet block (the "blox") that marks
+ * the current page, follows the pointer and can be dragged from cell to cell.
+ * On small screens the same block grows to fill the screen and becomes the menu.
+ *
+ * Geometry is driven by custom properties so the scripts only write numbers:
+ *   --bl / --br   left and right edge of the blox inside the tray
+ *   --bp          how far the blox is pressed in
+ *   --tray-r      right edge of the tray (it packs down to the logo on scroll)
+ *   --mt/mr/mb/ml/mrad   the menu's clip while it grows out of the blox
+ */
+
+.nav {
+  --nav-h: 3.5rem;
+  --nav-pad: 0.3125rem;
+  --nav-r: 1rem;
+  --nav-cell-r: calc(var(--nav-r) - var(--nav-pad));
+  --nav-inset: calc(var(--nav-pad) + 1rem);
+  --nav-gutter: clamp(0.75rem, 2vw, 1.5rem);
+  /* Hairline that keeps the dark blocks readable as shapes over dark sections. */
+  --nav-edge: inset 0 0 0 1px color-mix(in oklch, var(--paper) 10%, transparent);
+
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  padding: var(--nav-gutter);
+  pointer-events: none;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-bar > * {
+  pointer-events: auto;
+}
+
+.nav :focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 0;
+  box-shadow: 0 0 0 5px var(--ink);
+}
+
+.nav-skip {
+  position: absolute;
+  top: var(--nav-gutter);
+  left: var(--nav-gutter);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  height: var(--nav-h);
+  padding-inline: 1.25rem;
+  border-radius: var(--nav-r);
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 600;
+  pointer-events: auto;
+  translate: 0 calc(-100% - var(--nav-gutter) - 0.5rem);
+  transition: translate 240ms var(--ease-out-expo);
+}
+
+.nav-skip:focus-visible {
+  translate: 0;
+}
+
+/* Tray */
+
+.nav-tray {
+  position: relative;
+  border-radius: var(--nav-r);
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--nav-edge);
+  clip-path: inset(0 calc(100% - var(--tray-r, 100%)) 0 0 round var(--nav-r));
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.nav-row {
+  position: relative;
+  display: flex;
+  gap: 0.125rem;
+  padding: var(--nav-pad);
+}
+
+.nav-cell {
+  display: flex;
+  align-items: center;
+  height: calc(var(--nav-h) - 2 * var(--nav-pad));
+  padding-inline: 1.125rem;
+  border-radius: var(--nav-cell-r);
+  color: color-mix(in oklch, var(--paper) 78%, var(--ink));
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 200ms var(--ease-out-quart),
+    opacity 240ms var(--ease-out-quart),
+    translate 520ms var(--ease-out-expo);
+  transition-delay: 0ms, calc(var(--i) * 40ms), calc(var(--i) * 40ms);
+}
+
+.nav-cell--logo {
+  padding-inline: 1rem;
+}
+
+.nav-cell:hover,
+.nav-cell:focus-visible,
+.nav-cell[aria-current="page"],
+.nav-cell--logo {
+  color: var(--paper);
+}
+
+.nav .nav-cell:focus-visible {
+  outline-offset: -3px;
+  box-shadow: none;
+}
+
+.wordmark {
+  font-size: 1.4375rem;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+/* The blox: a tray-sized violet layer, clipped down to one cell. */
+
+.nav-blox {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--violet);
+  visibility: hidden;
+  clip-path: inset(
+    calc(var(--nav-pad) + var(--bp, 0px))
+      calc(100% - var(--br, 0px) + var(--bp, 0px))
+      calc(var(--nav-pad) + var(--bp, 0px))
+      calc(var(--bl, 0px) + var(--bp, 0px)) round var(--nav-cell-r)
+  );
+}
+
+.nav[data-ready] .nav-blox {
+  visibility: visible;
+}
+
+/* Until the script has measured the cells, the resting cell paints its own block. */
+.nav:not([data-ready]) .nav-cell[data-rest] {
+  background: var(--violet);
+}
+
+.nav[data-scrubbing] .nav-tray,
+.nav[data-scrubbing] .nav-cell {
+  cursor: grabbing;
+}
+
+/* Packed: on scroll the tray folds down to the logo block. */
+
+.nav[data-packed] .nav-cell:not(.nav-cell--logo) {
+  opacity: 0;
+  translate: -0.875rem 0;
+  transition-delay:
+    0ms, calc((var(--last) - var(--i)) * 25ms),
+    calc((var(--last) - var(--i)) * 25ms);
+}
+
+/* Call to action */
+
+.nav-cta {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: var(--nav-h);
+  margin-left: auto;
+  padding-inline: 1.25rem;
+  overflow: hidden;
+  border-radius: var(--nav-r);
+  background: var(--violet);
+  color: var(--paper);
+  box-shadow: var(--nav-edge);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: scale 160ms var(--ease-out-quart);
+}
+
+/* Ink floods the block from wherever the pointer came in, and drains to where it left. */
+.nav-cta::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: var(--fy, 50%);
+  left: var(--fx, 50%);
+  width: 260%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ink);
+  translate: -50% -50%;
+  scale: 0;
+  transition: scale 560ms var(--ease-out-expo);
+}
+
+.nav-cta:active {
+  scale: 0.97;
+}
+
+.nav-arrow {
+  width: 0.6875rem;
+  height: 0.6875rem;
+  flex: none;
+  transition: translate 320ms var(--ease-out-expo);
+}
+
+@media (hover: hover) {
+  .nav-cta:hover::before {
+    scale: 1;
+  }
+
+  .nav-cta:hover .nav-arrow {
+    translate: 0.125rem -0.125rem;
+  }
+}
+
+/* Menu button, small screens only */
+
+.nav-menu-btn {
+  display: none;
+  flex: none;
+  place-items: center;
+  width: var(--nav-h);
+  height: var(--nav-h);
+  border-radius: var(--nav-r);
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--nav-edge);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: scale 160ms var(--ease-out-quart);
+}
+
+.nav-menu-btn:active {
+  scale: 0.94;
+}
+
+.nav-bars {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.nav-bars i {
+  display: block;
+  width: 1.375rem;
+  height: 0.15625rem;
+  border-radius: 0.125rem;
+  background: currentColor;
+}
+
+/* Entrance: the blocks drop in, then the labels settle. CSS only, so it never waits on script. */
+
+.nav-tray,
+.nav-cta,
+.nav-menu-btn {
+  animation: nav-drop 820ms var(--ease-out-expo) backwards;
+}
+
+.nav-cta {
+  animation-delay: 80ms;
+}
+
+.nav-menu-btn {
+  animation-delay: 150ms;
+}
+
+.nav-label {
+  display: block;
+  animation: nav-rise 620ms var(--ease-out-expo) backwards;
+  animation-delay: calc(220ms + var(--i, 0) * 50ms);
+}
+
+@keyframes nav-drop {
+  from {
+    translate: 0 calc(-100% - var(--nav-gutter) - 0.25rem);
+  }
+}
+
+@keyframes nav-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.625rem;
+  }
+}
+
+/* Menu: the blox, grown to the size of the screen. */
+
+.nav-menu {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  border: 0;
+  background: var(--violet);
+  color: var(--paper);
+  pointer-events: auto;
+  clip-path: inset(
+    var(--mt, 0px) var(--mr, 0px) var(--mb, 0px) var(--ml, 0px) round
+      var(--mrad, 0px)
+  );
+}
+
+.nav-menu[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-menu::backdrop {
+  background: none;
+}
+
+/* The close button is the menu button's twin, sitting exactly on top of it. */
+.nav-menu .nav-menu-btn {
+  display: grid;
+  animation: none;
+}
+
+.nav-menu__bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--nav-gutter);
+}
+
+/* Same box as the tray, so the wordmark does not move when the menu takes over. */
+.nav-menu__logo {
+  padding: var(--nav-pad);
+}
+
+.nav-menu__list {
+  display: grid;
+  justify-items: start;
+  gap: 0.125rem;
+  margin-top: auto;
+  padding: 1.5rem var(--nav-gutter) 0;
+}
+
+.nav-menu__list li {
+  overflow: clip;
+}
+
+.nav-menu__link {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  padding: 0.09em var(--nav-inset) 0.15em;
+  border-radius: 0.28em;
+  font-size: clamp(2.75rem, min(16vw, 9.5dvh), 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* In the violet menu the block is ink: it sits on the current page and wipes in under a press. */
+.nav-menu__link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--ink);
+  scale: 0 1;
+  transform-origin: left;
+  transition: scale 280ms var(--ease-out-expo);
+}
+
+.nav-menu__link:active::before,
+.nav-menu__link[aria-current="page"]::before {
+  scale: 1;
+}
+
+.nav .nav-menu__link:focus-visible {
+  outline-width: 3px;
+  outline-offset: -3px;
+  box-shadow: none;
+}
+
+.nav-menu__foot {
+  display: grid;
+  flex: none;
+  gap: 1rem;
+  padding: 1.75rem var(--nav-gutter) max(1.25rem, env(safe-area-inset-bottom));
+}
+
+.nav-menu__cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4rem;
+  padding-inline: var(--nav-inset);
+  border-radius: var(--nav-r);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 1.125rem;
+  font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
+  transition: scale 160ms var(--ease-out-quart);
+}
+
+.nav-menu__cta:active {
+  scale: 0.98;
+}
+
+.nav-menu__cta .nav-arrow {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.nav-menu__tag {
+  padding-inline: var(--nav-inset);
+  font-weight: 500;
+}
+
+/* Small screens: the tray is just the logo block, the links move into the menu. */
+
+@media (width < 48rem) {
+  .nav-row li:not(:first-child) {
+    display: none;
+  }
+
+  .nav-menu-btn {
+    display: grid;
+  }
+
+  .nav-cta {
+    padding-inline: 1.125rem;
+  }
+}
+
+@media (width < 22.5rem) {
+  .nav-cta .nav-arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-tray,
+  .nav-cta,
+  .nav-menu-btn,
+  .nav-label {
+    animation: none;
+  }
+
+  .nav-skip,
+  .nav-cell,
+  .nav-cta,
+  .nav-cta::before,
+  .nav-arrow,
+  .nav-menu-btn,
+  .nav-menu__link::before,
+  .nav-menu__cta {
+    transition-duration: 0.01ms;
+    transition-delay: 0ms;
+  }
+}
