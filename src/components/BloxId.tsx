@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import Tick from "@/components/Tick";
 import { sample } from "@/lib/sample";
 
 const steps = [
@@ -95,21 +96,29 @@ export default function BloxId() {
             { autoAlpha: 1, duration: 0.4, ease: "power2.out" },
             SEND_AT + 0.55,
           )
-          .to(
-            ".bloxid-cell__pulse",
-            {
-              keyframes: { opacity: [0, 0.55, 0] },
-              duration: 0.45,
-              stagger: 0.1,
-              ease: "none",
-            },
-            SEND_AT + 0.4,
+          .fromTo(
+            ".bloxid-pad__sent path",
+            { drawSVG: "0%" },
+            { drawSVG: "100%", duration: 0.45, ease: "power2.out" },
+            SEND_AT + 0.6,
           )
           .fromTo(
             ".bloxid-money--in",
             { autoAlpha: 0, yPercent: -130 },
             { autoAlpha: 1, yPercent: 0, duration: 0.7 },
             SEND_AT + 1.35,
+          )
+          .fromTo(
+            ".bloxid-money__tick",
+            { scale: 0.4, autoAlpha: 0 },
+            { scale: 1, autoAlpha: 1, duration: 0.5 },
+            SEND_AT + 1.9,
+          )
+          .fromTo(
+            ".bloxid-money__tick path",
+            { drawSVG: "0%" },
+            { drawSVG: "100%", duration: 0.45, ease: "power2.out" },
+            SEND_AT + 2,
           )
           .fromTo(
             ".bloxid-facts li",
@@ -189,7 +198,10 @@ export default function BloxId() {
           >
             <div className="bloxid-row">
               <span className="bloxid-pad">
-                <span className="bloxid-pad__sent">Sent</span>
+                <span className="bloxid-pad__sent">
+                  <Tick />
+                  Sent
+                </span>
                 <strong className="bloxid-money bloxid-money--out">
                   {sample.amount}
                 </strong>
@@ -203,7 +215,6 @@ export default function BloxId() {
                   <span className="bloxid-cell__ink" />
                   <span className="bloxid-cell__violet" />
                   <span className="bloxid-cell__digit">{digit}</span>
-                  <span className="bloxid-cell__pulse" />
                 </span>
               ))}
             </div>
@@ -232,6 +243,9 @@ export default function BloxId() {
               </span>
               <span className="bloxid-pad">
                 <strong className="bloxid-money bloxid-money--in">
+                  <span className="bloxid-money__tick">
+                    <Tick />
+                  </span>
                   {sample.amount}
                 </strong>
               </span>

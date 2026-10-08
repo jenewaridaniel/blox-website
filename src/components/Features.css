@@ -595,6 +595,9 @@
 }
 
 .lk-sent strong {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   flex-basis: 100%;
   font-size: 1.0625rem;
   font-weight: 700;

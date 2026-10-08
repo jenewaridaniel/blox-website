@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Tick from "@/components/Tick";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { buildConvert, CONVERT_USDT } from "@/lib/rates";
 import { sample } from "@/lib/sample";
@@ -117,12 +118,24 @@ export default function Convert() {
             .to(".cv-status__wait", { autoAlpha: 0, duration: 0.25 }, 5.1)
             .to(".cv-status__done", { autoAlpha: 1, y: 0, duration: 0.6 }, 5.2)
             .fromTo(
-              ".cv-ring",
-              { autoAlpha: 0.7, scale: 0.6 },
-              { autoAlpha: 0, scale: 1.7, duration: 0.9, ease: "power2.out" },
+              ".cv-status__tick",
+              { scale: 0.4, autoAlpha: 0 },
+              { scale: 1, autoAlpha: 1, duration: 0.5 },
               5.2,
             )
+            .fromTo(
+              ".cv-status__tick path",
+              { drawSVG: "0%" },
+              { drawSVG: "100%", duration: 0.45, ease: "power2.out" },
+              5.3,
+            )
             .to(".cv-toast", { autoAlpha: 1, y: 0, duration: 0.7 }, 5.4)
+            .fromTo(
+              ".cv-toast__tick path",
+              { drawSVG: "0%" },
+              { drawSVG: "100%", duration: 0.45, ease: "power2.out" },
+              5.7,
+            )
             .to({}, { duration: 2.2 })
             .to([".cv-block", ".cv-toast"], {
               autoAlpha: 0,
@@ -233,13 +246,18 @@ export default function Convert() {
             <p className="cv-status">
               <span className="cv-status__wait">Waiting for the transfer</span>
               <span className="cv-status__done">
-                <i className="cv-ring" />
+                <span className="cv-status__tick">
+                  <Tick />
+                </span>
                 Received
               </span>
             </p>
           </div>
 
           <p className="cv-toast">
+            <span className="cv-toast__tick">
+              <Tick />
+            </span>
             {naira(info.amount)} sent to {sample.firstName}
           </p>
         </div>

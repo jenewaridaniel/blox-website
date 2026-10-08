@@ -254,7 +254,12 @@
   flex: none;
   background: var(--ink);
   color: var(--paper);
-  transition: none;
+  transition: background-color 300ms var(--ease-out-quart);
+}
+
+/* Approved: the lock turns into a tick on violet. */
+.sec-tile--pad[data-ok] {
+  background: var(--violet);
 }
 
 .sec-pad__head h3 {

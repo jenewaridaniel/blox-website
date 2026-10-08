@@ -109,8 +109,7 @@
 }
 
 .bloxid-cell__ink,
-.bloxid-cell__violet,
-.bloxid-cell__pulse {
+.bloxid-cell__violet {
   position: absolute;
   inset: 0;
 }
@@ -127,12 +126,6 @@
   position: relative;
 }
 
-/* A flash of paper that runs down the row as the money passes through. */
-.bloxid-cell__pulse {
-  background: var(--paper);
-  opacity: 0;
-}
-
 /* A pad is the slot the money block sits in. It leaves one by dropping out of sight and lands in the other. */
 .bloxid-pad {
   position: relative;
@@ -144,8 +137,10 @@
 }
 
 .bloxid-money {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
   padding-inline: 1rem;
   border-radius: inherit;
   background: var(--violet);
@@ -163,8 +158,33 @@
 .bloxid-pad__sent {
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.bloxid-pad__sent svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--violet);
+}
+
+/* A small paper tile with the tick in it, set beside the amount once it has landed. */
+.bloxid-money__tick {
   display: grid;
+  flex: none;
   place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--paper);
+  color: var(--violet);
+}
+
+.bloxid-money__tick svg {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .bloxid-pad__sent,

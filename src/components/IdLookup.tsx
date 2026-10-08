@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Tick from "@/components/Tick";
 import { sample } from "@/lib/sample";
 
 const NAMES = [
@@ -128,6 +129,9 @@ export default function IdLookup() {
             ) : (
               <div className="lk-sent">
                 <strong>
+                  <span className="lk-tick" aria-hidden="true">
+                    <Tick />
+                  </span>
                   {sample.amount} sent to {first}
                 </strong>
                 <span>Instant</span>

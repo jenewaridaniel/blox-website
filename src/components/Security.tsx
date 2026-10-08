@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
 } from "react";
+import Tick from "@/components/Tick";
 import { sample } from "@/lib/sample";
 
 // Only what the product does. Anything that needs a licence or a certificate to claim stays out
@@ -260,8 +261,11 @@ export default function Security() {
             </div>
 
             <div className="sec-pad__head">
-              <span className="sec-tile sec-tile--pad">
-                <Lock />
+              <span
+                className="sec-tile sec-tile--pad"
+                data-ok={approved ? "" : undefined}
+              >
+                {approved ? <Tick className="sec-lock" /> : <Lock />}
               </span>
               <div>
                 <h3>

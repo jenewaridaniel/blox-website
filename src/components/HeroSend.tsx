@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import Tick from "@/components/Tick";
 import { sample } from "@/lib/sample";
 
 export default function HeroSend() {
@@ -85,6 +86,17 @@ export default function HeroSend() {
           },
           "-=0.3",
         )
+        .fromTo(
+          ".sent-toast__icon path",
+          { drawSVG: "0%" },
+          {
+            drawSVG: "100%",
+            duration: 0.45,
+            ease: "power2.out",
+            immediateRender: false,
+          },
+          "<0.25",
+        )
         .to(
           [".sent-toast", ".send-card__match"],
           { autoAlpha: 0, duration: 0.3, ease: "power2.in" },
@@ -154,15 +166,7 @@ export default function HeroSend() {
 
       <div className="sent-toast-slot">
         <div className="sent-toast">
-          <svg className="sent-toast__icon" viewBox="0 0 11 11" fill="none">
-            <path
-              d="M1.5 9.5 9.5 1.5M3 1.5h6.5V8"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <Tick className="sent-toast__icon" />
           <p>
             <strong>{sample.amount} sent</strong>
             <span className="sent-toast__meta">
