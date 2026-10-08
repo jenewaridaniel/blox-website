@@ -1,0 +1,209 @@
+/*
+ * Footer. An ink block with the links, and "blox" set across the full width as a field of small blocks
+ * (FooterWordmark.tsx) that light up under the pointer. The words and links do the job; the wordmark is play.
+ */
+
+.footer {
+  padding: var(--gutter);
+}
+
+.footer-panel {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(1.5rem, 4.4vw, 4.5rem);
+  padding-bottom: clamp(1rem, 2vw, 1.5rem);
+  border-radius: clamp(1.5rem, 2.6vw, 2.5rem);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.ft-top-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 2.5rem clamp(2rem, 6vw, 6rem);
+}
+
+.ft-lead {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+.ft-tagline {
+  max-width: 14ch;
+  font-size: clamp(2rem, 4.4vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+/* A paper button on ink fills with violet, since ink would make it disappear. */
+.ft-lead .block-btn {
+  --btn-flood: var(--violet);
+  --btn-flood-fg: var(--paper);
+}
+
+.ft-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-content: start;
+}
+
+.ft-groups h2 {
+  margin-bottom: 0.75rem;
+  color: var(--paper-soft);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.ft-groups ul {
+  display: grid;
+  justify-items: start;
+  gap: 0.125rem;
+}
+
+/* A violet block wipes in behind a link when you point at it, the way the menu's current page does. */
+.ft-link {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+  padding: 0.3125rem 0.625rem;
+  margin-left: -0.625rem;
+  border-radius: 0.5rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ft-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--violet);
+  scale: 0 1;
+  transform-origin: left;
+  transition: scale 320ms var(--ease-out-expo);
+}
+
+.ft-link:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .ft-link:hover::before {
+    scale: 1;
+  }
+}
+
+.ft-link:focus-visible::before,
+.ft-link:active::before {
+  scale: 1;
+}
+
+.ft-hint {
+  color: var(--paper-soft);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* The wordmark: the canvas sizes itself to the width and sets its own height. */
+.ft-word {
+  position: relative;
+  /* Taps and drags are for the letters; scrolling the page still works on a vertical swipe. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ft-word canvas {
+  display: block;
+  width: 100%;
+}
+
+.ft-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  color: var(--paper-soft);
+  font-size: 0.875rem;
+}
+
+.ft-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.5rem;
+  padding-inline: 0.875rem;
+  border-radius: 0.75rem;
+  background: var(--ink-raised);
+  color: var(--paper);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 220ms var(--ease-out-quart),
+    scale 140ms var(--ease-out-quart);
+}
+
+/* The arrow points up for "back to top". */
+.ft-top .arrow {
+  rotate: -45deg;
+}
+
+.ft-top:active {
+  scale: 0.96;
+}
+
+.ft-top:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .ft-top:hover {
+    background: var(--violet);
+  }
+}
+
+.ft-credit {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ft-credit:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+}
+
+@media (width < 64rem) {
+  .ft-top-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (width < 30rem) {
+  .ft-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The letters stay still, so there is nothing to invite you to try. */
+  .ft-hint {
+    display: none;
+  }
+
+  .ft-link::before,
+  .ft-top {
+    transition-duration: 0.01ms;
+  }
+}

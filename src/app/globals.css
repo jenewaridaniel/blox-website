@@ -2,12 +2,30 @@
 @import "../components/BlockButton.css" layer(components);
 @import "../components/SiteNav.css" layer(components);
 @import "../components/Hero.css" layer(components);
+@import "../components/BloxId.css" layer(components);
+@import "../components/Trade.css" layer(components);
+@import "../components/Convert.css" layer(components);
+@import "../components/TopUp.css" layer(components);
+@import "../components/Security.css" layer(components);
+@import "../components/More.css" layer(components);
+@import "../components/GetApp.css" layer(components);
+@import "../components/Footer.css" layer(components);
+@import "../components/PageHero.css" layer(components);
+@import "../components/Features.css" layer(components);
+@import "../components/Help.css" layer(components);
 
 :root {
   /* Brand v5: violet #7B2CFF and ink #0E0B14. Paper is a white tinted toward the violet. */
   --violet: oklch(0.544 0.2759 290.83);
   --ink: oklch(0.1581 0.0193 299.48);
   --paper: oklch(0.985 0.006 295);
+  /* Paper pushed toward ink: quiet blocks on a paper surface, and the softer ink for secondary text. */
+  --paper-deep: color-mix(in oklch, var(--ink) 7%, var(--paper));
+  --ink-soft: color-mix(in oklch, var(--ink) 62%, var(--paper));
+  /* Ink lifted a step toward paper: raised blocks on an ink card. */
+  --ink-raised: color-mix(in oklch, var(--paper) 9%, var(--ink));
+  /* The same idea the other way round: softer paper for secondary text on ink. */
+  --paper-soft: color-mix(in oklch, var(--paper) 78%, var(--ink));
   /* Violet pushed toward ink: quiet blocks that sit on a violet surface. */
   --violet-deep: color-mix(in oklch, var(--ink) 28%, var(--violet));
 

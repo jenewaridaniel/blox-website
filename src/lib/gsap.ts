@@ -19,4 +19,13 @@ gsap.registerPlugin(
   DrawSVGPlugin,
 );
 
-export { gsap, useGSAP, ScrollTrigger, SplitText, Flip, Draggable, MotionPathPlugin, DrawSVGPlugin };
+export {
+  gsap,
+  useGSAP,
+  ScrollTrigger,
+  SplitText,
+  Flip,
+  Draggable,
+  MotionPathPlugin,
+  DrawSVGPlugin,
+};

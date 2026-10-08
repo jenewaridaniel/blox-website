@@ -22,6 +22,151 @@
   animation: hero-rise 900ms var(--ease-out-expo) backwards;
 }
 
+/* Background. A grid whose lines light up around the pointer, a soft glow, twinkling marks, and ripples
+   that spread out from the photo. The light's position is registered so it can glide instead of jump. */
+
+@property --mx {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 74%;
+}
+
+@property --my {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 36%;
+}
+
+.hero-bg {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
+  transition:
+    --mx 550ms var(--ease-out-quart),
+    --my 550ms var(--ease-out-quart);
+}
+
+.hero-bg__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      55% 70% at 8% 0%,
+      color-mix(in oklch, var(--paper) 14%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      50% 60% at 100% 100%,
+      color-mix(in oklch, var(--ink) 22%, transparent),
+      transparent
+    );
+}
+
+.hero-bg__grid {
+  --cell: clamp(3.25rem, 5.2vw, 5rem);
+  --line: color-mix(in oklch, var(--paper) 8%, transparent);
+
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+}
+
+/* The same grid again, brighter, and only visible inside a soft circle that follows the pointer. */
+.hero-bg__grid--lit {
+  --line: color-mix(in oklch, var(--paper) 42%, transparent);
+
+  mask-image: radial-gradient(
+    circle 16rem at var(--mx) var(--my),
+    #000 0%,
+    transparent 100%
+  );
+}
+
+.hero-cross {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: 0.875rem;
+  height: 0.875rem;
+  opacity: 0.18;
+  animation: hero-twinkle var(--t) cubic-bezier(0.65, 0, 0.35, 1) infinite
+    alternate;
+}
+
+.hero-cross::before,
+.hero-cross::after {
+  content: "";
+  position: absolute;
+  background: var(--paper);
+  border-radius: 1px;
+}
+
+.hero-cross::before {
+  inset: calc(50% - 1px) 0;
+}
+
+.hero-cross::after {
+  inset: 0 calc(50% - 1px);
+}
+
+/* Ripples spread out from behind the photo like a transfer going out, growing past its edges and fading. */
+.hero-ripples {
+  position: absolute;
+  top: 11%;
+  right: clamp(1rem, 3.4vw, 3.5rem);
+  bottom: 0;
+  width: min(25rem, 100% - 6rem);
+}
+
+.hero-ripples i {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: min(22rem, 90vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: 2px solid color-mix(in oklch, var(--paper) 70%, transparent);
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--paper) 3%, transparent);
+  opacity: 0;
+  animation: hero-ripple 7.5s var(--ease-out-quart) infinite;
+}
+
+.hero-ripples i:nth-child(2) {
+  animation-delay: 2.5s;
+}
+
+.hero-ripples i:nth-child(3) {
+  animation-delay: 5s;
+}
+
+@keyframes hero-twinkle {
+  to {
+    opacity: 0.6;
+  }
+}
+
+@keyframes hero-ripple {
+  0% {
+    opacity: 0;
+    scale: 0.7;
+  }
+
+  14% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 3.6;
+  }
+}
+
 /* Copy */
 
 .hero-copy {
@@ -186,7 +331,7 @@
 .send-card__label,
 .send-card__note,
 .sent-toast__meta {
-  color: color-mix(in oklch, var(--ink) 62%, var(--paper));
+  color: var(--ink-soft);
   font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.2;
@@ -198,9 +343,15 @@
   height: 2.75rem;
   padding-inline: 0.75rem;
   border-radius: 0.75rem;
-  background: color-mix(in oklch, var(--ink) 7%, var(--paper));
+  background: var(--paper-deep);
   font-size: 1.0625rem;
   font-weight: 600;
+}
+
+/* Eight digits, spaced so they can be read off one at a time. */
+.send-card__id {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
 }
 
 .send-card__caret {
@@ -211,7 +362,13 @@
   opacity: 0;
 }
 
-.hero-send[data-typing] .send-card__caret {
+.hero-send[data-typing] /* Eight digits, spaced so they can be read off one at a time. */
+.send-card__id {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+
+.send-card__caret {
   animation: hero-caret 900ms steps(1) infinite;
 }
 
@@ -407,6 +564,10 @@
 }
 
 @media (width < 30rem) {
+  .hero-ripples i {
+    animation-duration: 6s;
+  }
+
   .hero-actions {
     gap: 0.3rem;
   }
@@ -430,6 +591,25 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* No travelling ripples: one still ring stays as a quiet outline. */
+  .hero-ripples i {
+    animation: none;
+    opacity: 0;
+  }
+
+  .hero-ripples i:first-child {
+    opacity: 0.25;
+    scale: 1.35;
+  }
+
+  .hero-cross {
+    animation: none;
+  }
+
+  .hero-bg {
+    transition-duration: 0.01ms;
+  }
+
   .hero-panel,
   .hero-actions li,
   .hero-line > span,
@@ -439,7 +619,13 @@
   .hero-photo-back,
   .send-card,
   .sent-toast-slot,
-  .hero-send[data-typing] .send-card__caret {
+  .hero-send[data-typing] /* Eight digits, spaced so they can be read off one at a time. */
+.send-card__id {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+  }
+
+  .send-card__caret {
     animation: none;
   }
 }

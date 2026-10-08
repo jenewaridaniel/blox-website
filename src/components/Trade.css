@@ -1,0 +1,260 @@
+/*
+ * Buy, sell, swap. A large ink block with a field of blocks moving behind it
+ * (BlockField.tsx) and one card that shows a trade the way the app does: the
+ * rate, the fee and what you get, before you confirm.
+ */
+
+.trade {
+  padding: var(--gutter);
+}
+
+.trade-panel {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  /* A fixed track for the card, so it never resizes with the text inside it. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 24.5rem);
+  align-items: center;
+  gap: 2.5rem clamp(2rem, 5vw, 5rem);
+  min-height: clamp(38rem, 88svh, 54rem);
+  padding: clamp(1.5rem, 4.4vw, 4.5rem);
+  overflow: clip;
+  border-radius: clamp(1.5rem, 2.6vw, 2.5rem);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.block-field {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+}
+
+/* Copy */
+
+.trade-copy {
+  display: grid;
+  justify-items: start;
+  max-width: 35rem;
+}
+
+.trade-title {
+  font-size: clamp(2.25rem, 4.6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.trade-sub {
+  max-width: 36ch;
+  margin-top: clamp(1.25rem, 2vw, 1.75rem);
+  color: var(--paper-soft);
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  line-height: 1.5;
+}
+
+.trade-copy .block-btn {
+  /* On ink a paper button fills with violet; ink would make it disappear. */
+  --btn-flood: var(--violet);
+
+  margin-top: clamp(1.75rem, 2.8vw, 2.5rem);
+}
+
+/* Card */
+
+.trade-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 1.75rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* The tabs are the nav in miniature: an ink tray and one violet block that slides to the chosen cell. */
+.trade-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0.3125rem;
+  border-radius: 1.25rem;
+  background: var(--ink);
+}
+
+.trade-tabs__blox {
+  position: absolute;
+  top: 0.3125rem;
+  bottom: 0.3125rem;
+  left: 0.3125rem;
+  width: calc((100% - 0.625rem) / 3);
+  border-radius: 0.9375rem;
+  background: var(--violet);
+  translate: calc(var(--tab) * 100%) 0;
+  transition: translate 520ms var(--ease-out-expo);
+}
+
+.trade-tabs button {
+  position: relative;
+  height: 2.75rem;
+  border-radius: 0.9375rem;
+  color: var(--paper-soft);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 200ms var(--ease-out-quart);
+}
+
+.trade-tabs button:hover,
+.trade-tabs button[aria-selected="true"] {
+  color: var(--paper);
+}
+
+.trade-tabs button:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: -3px;
+}
+
+.trade-quote {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 0.5rem 0.25rem;
+}
+
+.trade-values {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.trade-give {
+  display: grid;
+  gap: 0.125rem;
+  padding: 0.125rem 0.625rem 0.625rem;
+}
+
+.trade-give span,
+.trade-line dt {
+  color: var(--ink-soft);
+}
+
+.trade-give span,
+.trade-line dt,
+.trade-get span {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.trade-give strong {
+  font-size: clamp(2rem, 3vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.trade-line,
+.trade-get {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8125rem 0.875rem;
+  border-radius: 0.875rem;
+}
+
+.trade-line {
+  background: var(--paper-deep);
+}
+
+.trade-line dd {
+  font-weight: 600;
+  text-align: right;
+}
+
+/* The answer gets the ink block. */
+.trade-get {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.trade-get span {
+  color: var(--paper-soft);
+}
+
+.trade-get strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Each figure settles in when the tab changes. */
+.trade-figure {
+  display: block;
+  animation: trade-figure 560ms var(--ease-out-expo) backwards;
+  animation-delay: calc(var(--i) * 55ms);
+}
+
+.trade-confirm {
+  height: 3.25rem;
+  border-radius: 0.875rem;
+  background: var(--violet);
+  color: var(--paper);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    scale 160ms var(--ease-out-quart),
+    background-color 260ms var(--ease-out-quart);
+}
+
+.trade-confirm:active {
+  scale: 0.98;
+}
+
+.trade-confirm[data-done] {
+  background: var(--ink);
+}
+
+.trade-confirm:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@keyframes trade-figure {
+  from {
+    opacity: 0;
+    translate: 0 0.5em;
+  }
+}
+
+@media (width < 64rem) {
+  .trade-panel {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    min-height: 0;
+    /* Room under the card for the field to show; on a phone the card covers most of it otherwise. */
+    padding-block: clamp(2rem, 8vw, 4rem) clamp(5rem, 24vw, 8rem);
+    padding-inline: clamp(1.25rem, 6vw, 3.5rem);
+  }
+
+  .trade-card {
+    justify-self: center;
+    width: min(100%, 26rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trade-figure {
+    animation: none;
+  }
+
+  .trade-tabs__blox,
+  .trade-tabs button,
+  .trade-confirm {
+    transition-duration: 0.01ms;
+  }
+}

@@ -1,0 +1,313 @@
+/*
+ * USDT to Naira to sent. One block makes the whole journey: it starts as 100 USDT, fills with violet
+ * and turns into Naira, then crosses to a person's Blox ID and lands. Convert.tsx plays it while the
+ * section is in view. The markup holds the finished state, so with no script or reduced motion that is
+ * what shows.
+ */
+
+.convert {
+  padding: var(--gutter);
+}
+
+.convert-panel {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 40rem);
+  align-items: center;
+  gap: 3rem clamp(2rem, 5vw, 5rem);
+  padding: clamp(1.5rem, 4.4vw, 4.5rem);
+  overflow: clip;
+  border-radius: clamp(1.5rem, 2.6vw, 2.5rem);
+  background: var(--paper-deep);
+  color: var(--ink);
+}
+
+.convert-copy {
+  display: grid;
+  justify-items: start;
+  max-width: 32rem;
+}
+
+.convert-title {
+  font-size: clamp(2.25rem, 4.6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.convert-sub {
+  max-width: 38ch;
+  margin-top: clamp(1.25rem, 2vw, 1.75rem);
+  color: var(--ink-soft);
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  line-height: 1.5;
+}
+
+.convert-steps {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: clamp(1.5rem, 2.6vw, 2.25rem);
+}
+
+.convert-steps li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.convert-steps span {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+/* Scene: three slots in a row. The block starts in the first and ends in the third. */
+
+.convert-scene {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+/* The track the money runs along, behind everything. */
+.convert-scene::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: 12%;
+  left: 12%;
+  height: 0;
+  border-top: 2px dashed color-mix(in oklch, var(--ink) 28%, transparent);
+}
+
+.cv-slot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.625rem;
+}
+
+/* Inset by the same amount as the recipient card's padding, so the block is exactly as wide as the slot it lands in. */
+.cv-slot--from {
+  z-index: 3;
+  padding-inline: 0.75rem;
+}
+
+.cv-well {
+  display: block;
+  height: 5.25rem;
+  border-radius: 1.125rem;
+  background: color-mix(in oklch, var(--ink) 6%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--ink) 14%, transparent);
+}
+
+/* The block sits exactly over the first well, and travels to the second. */
+.cv-block {
+  position: absolute;
+  top: 0;
+  right: 0.75rem;
+  left: 0.75rem;
+  height: 5.25rem;
+  overflow: clip;
+  border-radius: 1.125rem;
+  color: var(--paper);
+}
+
+.cv-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.cv-layer--ink {
+  background: var(--ink);
+}
+
+.cv-layer--violet {
+  background: var(--violet);
+}
+
+.cv-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 0.25rem;
+  padding-inline: 1.125rem;
+}
+
+.cv-face small,
+.cv-person small {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.cv-face small {
+  color: var(--paper-soft);
+}
+
+.cv-face strong {
+  font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* The finished state, until the story takes over. */
+.cv-face--usdt {
+  opacity: 0;
+}
+
+.cv-face--naira .cv-amount {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The rate sits on the track between the two ends. */
+.cv-slot--rate {
+  justify-items: center;
+}
+
+.cv-chip {
+  display: grid;
+  gap: 0.125rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.875rem;
+  background: var(--paper);
+  text-align: center;
+}
+
+.cv-chip strong {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* The person at the other end. */
+.cv-slot--to {
+  padding: 0.75rem;
+  border-radius: 1.5rem;
+  background: var(--paper);
+}
+
+.cv-person {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.cv-person strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.cv-person small {
+  color: var(--ink-soft);
+}
+
+.cv-avatar {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: var(--violet);
+  color: var(--paper);
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+
+.cv-status {
+  position: relative;
+  display: grid;
+  height: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.cv-status > span {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cv-status__wait {
+  color: var(--ink-soft);
+  opacity: 0;
+}
+
+.cv-status__done {
+  position: relative;
+  color: var(--violet);
+}
+
+.cv-ring {
+  position: absolute;
+  top: 50%;
+  left: 0.5rem;
+  width: 3rem;
+  aspect-ratio: 1;
+  border: 2px solid var(--violet);
+  border-radius: 50%;
+  opacity: 0;
+  translate: -50% -50%;
+}
+
+.cv-toast {
+  grid-column: 1 / -1;
+  z-index: 2;
+  justify-self: center;
+  padding: 0.625rem 1rem;
+  border-radius: 0.875rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+/* Stacked: the same journey, top to bottom. */
+@media (width < 64rem) {
+  .convert-panel {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: clamp(1.25rem, 6vw, 3.5rem);
+  }
+
+  .convert-scene {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 1.25rem;
+    width: min(100%, 22rem);
+    justify-self: center;
+  }
+
+  .convert-scene::before {
+    top: 4%;
+    right: auto;
+    bottom: 22%;
+    left: 50%;
+    height: auto;
+    border-top: 0;
+    border-left: 2px dashed color-mix(in oklch, var(--ink) 28%, transparent);
+  }
+
+  .cv-slot {
+    width: 100%;
+  }
+}

@@ -1,0 +1,717 @@
+/*
+ * The Features page. A sticky index of chapters, then one chapter at a time: a title, features that open
+ * one at a time, and a working picture of the thing on the other side. Chapters swap sides as you go.
+ */
+
+/* Sticky index */
+
+.fx-index {
+  position: sticky;
+  top: calc(var(--gutter) + 4rem);
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  padding: 1rem var(--gutter) 0;
+  /* Only the strip itself takes clicks; the space around it stays part of the page. */
+  pointer-events: none;
+}
+
+.fx-index__scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border-radius: 1.25rem;
+  background: var(--ink);
+  box-shadow: 0 0.75rem 2rem -0.75rem
+    color-mix(in oklch, var(--ink) 50%, transparent);
+  pointer-events: auto;
+  scrollbar-width: none;
+}
+
+.fx-index__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.fx-index__tray {
+  --w: 8.75rem;
+
+  position: relative;
+  width: max-content;
+  padding: 0.3125rem;
+}
+
+.fx-index__tray ul {
+  display: grid;
+  grid-template-columns: repeat(var(--n), var(--w));
+}
+
+.fx-index__blox {
+  position: absolute;
+  top: 0.3125rem;
+  bottom: 0.3125rem;
+  left: 0.3125rem;
+  width: var(--w);
+  border-radius: 0.9375rem;
+  background: var(--violet);
+  translate: calc(var(--a) * var(--w)) 0;
+  transition: translate 560ms var(--ease-out-expo);
+}
+
+.fx-index a {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 2.625rem;
+  border-radius: 0.9375rem;
+  color: var(--paper-soft);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 200ms var(--ease-out-quart);
+}
+
+.fx-index a:hover,
+.fx-index a[aria-current="true"] {
+  color: var(--paper);
+}
+
+.fx-index a:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: -3px;
+}
+
+/* Chapters */
+
+.fx-chapter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: 2rem clamp(2rem, 6vw, 6rem);
+  /* Clears the nav and the sticky index when you jump to a chapter. */
+  scroll-margin-top: 8rem;
+  padding: clamp(3rem, 7vw, 6rem)
+    calc(var(--gutter) + clamp(0.75rem, 4.4vw, 4.5rem));
+}
+
+.fx-chapter[data-flip] .fx-visual {
+  order: -1;
+}
+
+.fx-text {
+  display: grid;
+  justify-items: start;
+}
+
+.fx-num {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: var(--violet);
+  color: var(--paper);
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+
+.fx-title {
+  max-width: 16ch;
+  margin-top: 1rem;
+  font-size: clamp(2rem, 4.2vw, 3.875rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.03;
+  text-wrap: balance;
+}
+
+.fx-lead {
+  max-width: 40ch;
+  margin-top: 1rem;
+  color: var(--ink-soft);
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  line-height: 1.5;
+}
+
+/* Features that open one at a time */
+
+.fx-rows {
+  display: grid;
+  gap: 0.375rem;
+  width: 100%;
+  margin-top: clamp(1.5rem, 2.6vw, 2.25rem);
+}
+
+.fx-row {
+  border-radius: 1.125rem;
+  background: var(--paper-deep);
+  transition:
+    background-color 320ms var(--ease-out-quart),
+    color 320ms var(--ease-out-quart);
+}
+
+.fx-row[data-open] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.fx-row button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.9375rem 1rem 0.9375rem 1.125rem;
+  border-radius: inherit;
+  font-size: clamp(1.0625rem, 1.3vw, 1.1875rem);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fx-row button:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+
+/* A plus that turns into a minus. */
+.fx-row i {
+  position: relative;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--paper);
+  transition: background-color 320ms var(--ease-out-quart);
+}
+
+.fx-row i::before,
+.fx-row i::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.75rem;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ink);
+  translate: -50% -50%;
+  transition: rotate 320ms var(--ease-out-expo);
+}
+
+.fx-row i::after {
+  rotate: 90deg;
+}
+
+.fx-row[data-open] i {
+  background: var(--violet);
+}
+
+.fx-row[data-open] i::before,
+.fx-row[data-open] i::after {
+  background: var(--paper);
+}
+
+.fx-row[data-open] i::after {
+  rotate: 0deg;
+}
+
+.fx-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 420ms var(--ease-out-expo);
+}
+
+.fx-row[data-open] .fx-panel {
+  grid-template-rows: 1fr;
+}
+
+.fx-panel p {
+  min-height: 0;
+  padding-inline: 1.125rem 1rem;
+  overflow: hidden;
+  color: var(--paper-soft);
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: padding-bottom 420ms var(--ease-out-expo);
+}
+
+.fx-row[data-open] .fx-panel p {
+  padding-bottom: 1.125rem;
+}
+
+/* The picture: a coloured block holding a working version of the chapter. */
+
+.fx-visual {
+  display: grid;
+  /* One fixed-width column, so every card inside is the same width and sits in the middle. */
+  grid-template-columns: minmax(0, 26rem);
+  gap: 1rem;
+  justify-content: center;
+  align-content: center;
+  min-height: clamp(26rem, 60svh, 38rem);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  overflow: clip;
+  border-radius: clamp(1.5rem, 2.4vw, 2.25rem);
+}
+
+.fx-visual[data-tone="violet"] {
+  background: var(--violet);
+}
+
+.fx-visual[data-tone="ink"] {
+  background: var(--ink);
+}
+
+.fx-visual[data-tone="deep"] {
+  background: var(--paper-deep);
+}
+
+/* The home page's cards span several columns of its own grid; here every card takes the one column. */
+.fx-visual > * {
+  grid-column: 1;
+}
+
+/* The history card is two columns on the home page. In this narrower picture it stacks. */
+.fx-visual .more-card--history {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+}
+
+.fx-visual > .phone {
+  justify-self: center;
+  width: min(100%, 21rem);
+}
+
+/* Identity check */
+
+.kyc,
+.lk,
+.fxn {
+  padding: 1.125rem;
+  border-radius: 1.5rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.kyc {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.kyc-label,
+.fxn-label {
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.kyc-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0.25rem;
+  border-radius: 1rem;
+  background: var(--paper-deep);
+}
+
+.kyc-tabs__blox {
+  position: absolute;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  width: calc((100% - 0.5rem) / 3);
+  border-radius: 0.75rem;
+  background: var(--ink);
+  translate: calc(var(--s) * 100%) 0;
+  transition:
+    translate 520ms var(--ease-out-expo),
+    background-color 320ms var(--ease-out-quart);
+}
+
+.kyc-tabs__blox[data-s="1"] {
+  background: var(--violet);
+}
+
+.kyc-tabs__blox[data-s="2"] {
+  background: var(--ink-soft);
+}
+
+.kyc-tabs button {
+  position: relative;
+  height: 2.625rem;
+  border-radius: 0.75rem;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 220ms var(--ease-out-quart);
+}
+
+.kyc-tabs button[aria-checked="true"] {
+  color: var(--paper);
+}
+
+.kyc-tabs button:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+
+.kyc-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  animation: kyc-in 420ms var(--ease-out-expo) backwards;
+}
+
+.kyc-status__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.kyc-status[data-s="1"] .kyc-status__icon {
+  background: var(--violet);
+}
+
+.kyc-status[data-s="2"] .kyc-status__icon {
+  background: var(--ink-soft);
+}
+
+.kyc-status svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.kyc-id {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  background: var(--paper-deep);
+}
+
+.kyc-id > span {
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.kyc-digits {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+.kyc-digits b {
+  display: grid;
+  place-items: center;
+  height: 2.375rem;
+  border-radius: 0.5rem;
+  background: var(--paper);
+  font-size: 1.0625rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color 280ms var(--ease-out-quart) calc(var(--i) * 60ms),
+    color 280ms var(--ease-out-quart) calc(var(--i) * 60ms);
+}
+
+.kyc-digits b[data-on] {
+  background: var(--violet);
+  color: var(--paper);
+}
+
+@keyframes kyc-in {
+  from {
+    opacity: 0;
+    translate: 0 0.375rem;
+  }
+}
+
+/* Blox ID lookup */
+
+.lk {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.lk-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.lk-field span {
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.lk-field input {
+  height: 3.5rem;
+  padding-inline: 1rem;
+  border-radius: 0.875rem;
+  background: var(--paper-deep);
+  color: var(--ink);
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.14em;
+}
+
+.lk-field input::placeholder {
+  color: color-mix(in oklch, var(--ink) 35%, transparent);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.lk-field input:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+
+.lk-meter {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+.lk-meter i {
+  height: 0.25rem;
+  border-radius: 0.125rem;
+  background: color-mix(in oklch, var(--ink) 12%, transparent);
+  transition: background-color 200ms var(--ease-out-quart);
+}
+
+.lk-meter i[data-on] {
+  background: var(--violet);
+}
+
+.lk-result {
+  display: grid;
+  align-content: start;
+  min-height: 7.5rem;
+}
+
+.lk-hint {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.lk-hint button {
+  color: var(--violet);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.lk-hint button:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+
+.lk-found {
+  display: grid;
+  gap: 0.75rem;
+  animation: kyc-in 420ms var(--ease-out-expo) backwards;
+}
+
+.lk-who {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  background: var(--paper-deep);
+}
+
+.lk-who strong {
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.lk-who small {
+  margin-left: auto;
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.lk-tick {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--violet);
+  color: var(--paper);
+}
+
+.lk-tick svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.lk-confirm {
+  height: 3rem;
+  border-radius: 0.875rem;
+  background: var(--violet);
+  color: var(--paper);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: scale 140ms var(--ease-out-quart);
+}
+
+.lk-confirm:active {
+  scale: 0.98;
+}
+
+.lk-confirm:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.lk-sent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.lk-sent strong {
+  flex-basis: 100%;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.lk-sent span {
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.5rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+/* Bills */
+
+.fxn {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.fxn-label:not(:first-child) {
+  margin-top: 0.5rem;
+}
+
+.fxn-nets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.375rem;
+}
+
+.fxn-nets li {
+  display: grid;
+  justify-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 0.25rem;
+  border-radius: 0.875rem;
+  background: var(--paper-deep);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.fxn-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.fxn-chips li {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.625rem;
+  background: var(--paper-deep);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.fxn-chips li:nth-child(3) {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.fxn-bundles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.375rem;
+}
+
+.fxn-bundles li {
+  display: grid;
+  gap: 0.125rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.875rem;
+  background: var(--paper-deep);
+}
+
+.fxn-bundles strong {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.fxn-bundles span {
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+}
+
+@media (width < 64rem) {
+  .fx-chapter {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Text first on a narrow screen, whichever side the picture sits on at full width. */
+  .fx-chapter[data-flip] .fx-visual {
+    order: 0;
+  }
+
+  .fx-visual {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kyc-status,
+  .lk-found {
+    animation: none;
+  }
+
+  .fx-index__blox,
+  .fx-row,
+  .fx-row i,
+  .fx-row i::before,
+  .fx-row i::after,
+  .fx-panel,
+  .fx-panel p,
+  .kyc-tabs__blox,
+  .kyc-digits b,
+  .lk-meter i {
+    transition-duration: 0.01ms;
+    transition-delay: 0ms;
+  }
+}

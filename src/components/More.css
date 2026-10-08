@@ -1,0 +1,527 @@
+/*
+ * Everything around the money. Three cards of different weight: withdraw is the wide one, receive the
+ * narrow one, history runs the full width. Each is a small working demo.
+ */
+
+.more {
+  padding: clamp(4rem, 9vw, 7.5rem) var(--gutter);
+  color: var(--ink);
+}
+
+.more-inner {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  /* Lines up with the hero's copy. */
+  padding-inline: clamp(0.75rem, 4.4vw, 4.5rem);
+}
+
+.more-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: end;
+  gap: 1rem clamp(1.5rem, 5vw, 5rem);
+}
+
+.more-title {
+  max-width: 16ch;
+  font-size: clamp(2.125rem, 4.7vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.more-sub {
+  max-width: 36ch;
+  padding-bottom: 0.25em;
+  color: var(--ink-soft);
+  font-size: clamp(1rem, 1.3vw, 1.1875rem);
+  line-height: 1.5;
+}
+
+.more-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(0.5rem, 1.2vw, 1rem);
+  /* Lets the cards hold their content width instead of stretching to the tallest. */
+  align-items: start;
+}
+
+.more-card {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.25rem, 2.4vw, 2rem);
+  border-radius: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+.more-card h3 {
+  font-size: clamp(1.375rem, 2vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.more-lede {
+  max-width: 42ch;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.more-card--withdraw {
+  grid-column: span 7;
+  background: var(--paper-deep);
+}
+
+.more-card--receive {
+  grid-column: span 5;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.more-card--receive .more-lede {
+  color: var(--paper-soft);
+}
+
+.more-card--withdraw .more-lede {
+  color: var(--ink-soft);
+}
+
+.more-card--history {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  background: var(--violet);
+  color: var(--paper);
+}
+
+.more-card--history .more-lede {
+  color: var(--paper);
+}
+
+/* Withdraw */
+
+.wd-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.wd-steps li {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.875rem;
+  background: var(--paper);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.wd-steps span {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: 0.5rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+/* The progress track: three stops, a fill that grows to the current one, and a colour for how it ended. */
+.wd-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 1.75rem;
+  margin-inline: 0.5rem;
+}
+
+.wd-track::before,
+.wd-track__fill {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 0.375rem;
+  border-radius: 0.1875rem;
+  translate: 0 -50%;
+}
+
+.wd-track::before {
+  right: 0;
+  background: color-mix(in oklch, var(--ink) 12%, transparent);
+}
+
+.wd-track__fill {
+  width: calc(var(--p) * 50%);
+  background: var(--violet);
+  transition: width 700ms var(--ease-out-expo);
+}
+
+.wd-track[data-end] .wd-track__fill {
+  width: 100%;
+  background: var(--ink-soft);
+}
+
+.wd-track__dot {
+  position: relative;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 3px color-mix(in oklch, var(--ink) 18%, transparent);
+  transition:
+    background-color 300ms var(--ease-out-quart),
+    box-shadow 300ms var(--ease-out-quart);
+}
+
+.wd-track__dot[data-on] {
+  background: var(--violet);
+  box-shadow: none;
+}
+
+.wd-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.wd-statuses button,
+.hs-filters button {
+  height: 2.25rem;
+  padding-inline: 0.875rem;
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 220ms var(--ease-out-quart),
+    color 220ms var(--ease-out-quart);
+}
+
+.wd-statuses button {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.wd-statuses button[aria-checked="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.wd-statuses button[data-kind][aria-checked="true"] {
+  background: var(--ink-soft);
+}
+
+.wd-statuses button:focus-visible,
+.hs-filters button:focus-visible,
+.rx-copy:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--ink);
+}
+
+/* Receive */
+
+.rx-id {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  padding: 0.875rem 0.875rem 0.875rem 1rem;
+  border-radius: 1rem;
+  background: var(--ink-raised);
+}
+
+.rx-id span {
+  grid-column: 1 / -1;
+  color: var(--paper-soft);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.rx-id strong {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.rx-copy {
+  height: 2.5rem;
+  padding-inline: 1rem;
+  border-radius: 0.75rem;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 220ms var(--ease-out-quart),
+    color 220ms var(--ease-out-quart),
+    scale 140ms var(--ease-out-quart);
+}
+
+.rx-copy:active {
+  scale: 0.96;
+}
+
+.rx-copy[data-done] {
+  background: var(--violet);
+  color: var(--paper);
+}
+
+.rx-address {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem;
+  border-radius: 1rem;
+  background: var(--ink-raised);
+}
+
+.rx-address strong {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.rx-address p {
+  margin-top: 0.25rem;
+  color: var(--paper-soft);
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.rx-qr {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  width: 6.5rem;
+  padding: 0.375rem;
+  border-radius: 0.625rem;
+  background: var(--paper);
+}
+
+.rx-qr i {
+  aspect-ratio: 1;
+  background: transparent;
+}
+
+.rx-qr i[data-on] {
+  background: var(--ink);
+}
+
+.rx-address .rx-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  color: var(--paper);
+  font-weight: 600;
+}
+
+.rx-warning svg {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.0625rem;
+}
+
+/* History */
+
+.hs-side {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+}
+
+.hs-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: fit-content;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.875rem;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  animation: hs-alert 600ms var(--ease-out-expo) backwards;
+}
+
+.hs-alert svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--violet);
+}
+
+.hs-main {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.hs-search {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  height: 3rem;
+  padding-inline: 0.875rem;
+  border-radius: 0.875rem;
+  background: var(--violet-deep);
+}
+
+.hs-search svg {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.hs-search input {
+  min-width: 0;
+  flex: 1;
+  background: transparent;
+  color: var(--paper);
+  font-size: 1rem;
+  outline: none;
+}
+
+.hs-search input::placeholder {
+  color: var(--paper-soft);
+}
+
+.hs-search:focus-within {
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+}
+
+.hs-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.hs-filters button {
+  background: var(--violet-deep);
+  color: var(--paper);
+}
+
+.hs-filters button[aria-checked="true"] {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.hs-list {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.hs-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem 0.625rem 0.625rem;
+  border-radius: 0.875rem;
+  background: var(--violet-deep);
+  animation: hs-row 420ms var(--ease-out-expo) backwards;
+}
+
+.hs-list strong {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.hs-list small {
+  color: var(--paper-soft);
+  font-size: 0.8125rem;
+}
+
+.hs-list b {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.hs-kind {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.hs-list .hs-empty {
+  display: block;
+  padding: 1rem;
+  color: var(--paper-soft);
+  font-size: 0.9375rem;
+}
+
+@keyframes hs-alert {
+  from {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+}
+
+@keyframes hs-row {
+  from {
+    opacity: 0;
+    translate: 0 0.375rem;
+  }
+}
+
+@media (width < 64rem) {
+  .more-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .more-card--withdraw,
+  .more-card--receive,
+  .more-card--history {
+    grid-column: 1 / -1;
+  }
+
+  .more-card--history {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (width < 36rem) {
+  .wd-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rx-address {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-alert,
+  .hs-list li {
+    animation: none;
+  }
+
+  .wd-track__fill,
+  .wd-track__dot,
+  .rx-copy,
+  .wd-statuses button,
+  .hs-filters button {
+    transition-duration: 0.01ms;
+  }
+}

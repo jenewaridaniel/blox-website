@@ -1,0 +1,590 @@
+/*
+ * Security. A violet block: four rows that lock one after another when the section first comes into
+ * view, and a PIN pad you can tap, with a dial behind it that turns a notch for every key. The rows
+ * are locked by default; Security.tsx opens them first (data-lock="armed") only when motion is allowed,
+ * so without script or with reduced motion the finished state is what you see.
+ */
+
+.security {
+  padding: var(--gutter);
+}
+
+.security-panel {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 22rem);
+  align-items: center;
+  gap: 3rem clamp(2rem, 6vw, 6rem);
+  min-height: clamp(36rem, 86svh, 52rem);
+  padding: clamp(1.5rem, 4.4vw, 4.5rem);
+  overflow: clip;
+  border-radius: clamp(1.5rem, 2.6vw, 2.5rem);
+  background: var(--violet);
+  color: var(--paper);
+}
+
+/* Copy */
+
+.security-copy {
+  display: grid;
+  justify-items: start;
+  max-width: 40rem;
+}
+
+.security-title {
+  font-size: clamp(2.25rem, 4.6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.security-sub {
+  max-width: 38ch;
+  margin-top: clamp(1.25rem, 2vw, 1.75rem);
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  line-height: 1.5;
+}
+
+.security-list {
+  display: grid;
+  gap: 0.375rem;
+  width: 100%;
+  margin-top: clamp(1.75rem, 3vw, 2.75rem);
+}
+
+.sec-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem 0.875rem 0.75rem 0.75rem;
+  border-radius: 1.125rem;
+  background: var(--violet-deep);
+}
+
+.sec-tile {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  background: var(--paper);
+  color: var(--ink);
+  transition:
+    background-color 320ms var(--ease-out-quart) calc(var(--i, 0) * 450ms),
+    color 320ms var(--ease-out-quart) calc(var(--i, 0) * 450ms);
+}
+
+.sec-lock {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+/* The shackle sits raised and tilted while the lock is open, and drops shut when it locks. */
+.sec-lock__shackle {
+  transform-box: fill-box;
+  transform-origin: 100% 100%;
+  transition:
+    translate 420ms var(--ease-out-expo) calc(var(--i, 0) * 450ms),
+    rotate 420ms var(--ease-out-expo) calc(var(--i, 0) * 450ms);
+}
+
+.sec-text h3 {
+  font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.sec-text p {
+  margin-top: 0.125rem;
+  color: var(--paper-soft);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.sec-status {
+  display: grid;
+  height: 1.875rem;
+  min-width: 4.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.sec-status > span {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  border-radius: 0.5rem;
+  transition:
+    opacity 260ms var(--ease-out-quart) calc(var(--i, 0) * 450ms),
+    translate 380ms var(--ease-out-expo) calc(var(--i, 0) * 450ms);
+}
+
+.sec-status__locked {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.sec-status__open {
+  color: var(--paper-soft);
+  box-shadow: inset 0 0 0 1.5px
+    color-mix(in oklch, var(--paper) 40%, transparent);
+  opacity: 0;
+  translate: 0 -0.375rem;
+}
+
+/* Armed: every lock is open. Locked is the resting state, so a lock that never gets armed still reads right. */
+.security[data-lock="armed"] .sec-tile {
+  background: color-mix(in oklch, var(--ink) 30%, var(--violet-deep));
+  color: var(--paper-soft);
+}
+
+.security[data-lock="armed"] .sec-lock__shackle {
+  translate: 0 -2.5px;
+  rotate: 24deg;
+}
+
+.security[data-lock="armed"] .sec-status__open {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.security[data-lock="armed"] .sec-status__locked {
+  opacity: 0;
+  translate: 0 0.375rem;
+}
+
+.security[data-lock="done"] .sec-tile {
+  animation: sec-snap 520ms var(--ease-out-expo)
+    calc(var(--i, 0) * 450ms + 160ms) backwards;
+}
+
+@keyframes sec-snap {
+  45% {
+    scale: 1.14;
+  }
+}
+
+/* Stage: the pad with a dial turning behind it */
+
+.security-stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+
+.sec-dial {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: min(50rem, 170%);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.sec-dial__spin {
+  position: absolute;
+  inset: 0;
+  animation: sec-spin 90s linear infinite;
+}
+
+.sec-dial__ticks,
+.sec-dial__ring {
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* Long marks every thirty degrees, short ones every six. Each key press turns the ring a notch. */
+.sec-dial__ticks {
+  inset: 0;
+  background:
+    repeating-conic-gradient(
+      from -0.7deg,
+      color-mix(in oklch, var(--paper) 60%, transparent) 0 1.4deg,
+      transparent 1.4deg 30deg
+    ),
+    repeating-conic-gradient(
+      from -0.3deg,
+      color-mix(in oklch, var(--paper) 38%, transparent) 0 0.6deg,
+      transparent 0.6deg 6deg
+    );
+  mask-image: radial-gradient(
+    circle,
+    transparent 0 60%,
+    #000 60.4% 71%,
+    transparent 71.4%
+  );
+  rotate: calc(var(--turn, 0) * 15deg);
+  transition: rotate 700ms var(--ease-out-expo);
+}
+
+.sec-dial__ring {
+  inset: 7%;
+  border: 1.5px solid color-mix(in oklch, var(--paper) 16%, transparent);
+}
+
+.sec-dial__ring--inner {
+  inset: 24%;
+}
+
+/* PIN pad */
+
+.sec-pad {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 22rem);
+  padding: 1rem;
+  border-radius: 1.75rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.sec-pad__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sec-tile--pad {
+  flex: none;
+  background: var(--ink);
+  color: var(--paper);
+  transition: none;
+}
+
+.sec-pad__head h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sec-pad__head p {
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+.sec-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.875rem;
+  padding-block: 0.25rem;
+}
+
+.sec-dots i {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--ink) 25%, transparent);
+  transition:
+    background-color 200ms var(--ease-out-quart),
+    box-shadow 200ms var(--ease-out-quart),
+    scale 260ms var(--ease-out-expo);
+}
+
+.sec-dots i[data-on] {
+  background: var(--ink);
+  box-shadow: none;
+  scale: 1.12;
+}
+
+.sec-dots i[data-approved] {
+  background: var(--violet);
+}
+
+.sec-keys {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.375rem;
+}
+
+.sec-key {
+  display: grid;
+  place-items: center;
+  height: 3.25rem;
+  border-radius: 0.875rem;
+  background: var(--paper-deep);
+  color: var(--ink);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 200ms var(--ease-out-quart),
+    color 200ms var(--ease-out-quart),
+    scale 140ms var(--ease-out-quart);
+}
+
+.sec-key:active {
+  scale: 0.94;
+  background: var(--violet);
+  color: var(--paper);
+}
+
+.sec-key:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+
+.sec-key--delete {
+  background: transparent;
+}
+
+.sec-key--delete svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+@media (hover: hover) {
+  .sec-key:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .sec-key--delete:hover {
+    background: var(--paper-deep);
+    color: var(--ink);
+  }
+}
+
+@keyframes sec-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (width < 64rem) {
+  .security-panel {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    min-height: 0;
+    padding-inline: clamp(1.25rem, 6vw, 3.5rem);
+    padding-block: clamp(2rem, 8vw, 4rem);
+  }
+
+  .sec-dial {
+    width: min(40rem, 190%);
+  }
+}
+
+@media (width < 30rem) {
+  .sec-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  /* The text already says it; on a narrow screen the status chip would only squeeze it. */
+  .sec-status {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sec-dial__spin {
+    animation: none;
+  }
+
+  .security[data-lock="done"] .sec-tile {
+    animation: none;
+  }
+
+  .sec-tile,
+  .sec-lock__shackle,
+  .sec-status > span,
+  .sec-dial__ticks,
+  .sec-dots i,
+  .sec-key {
+    transition-duration: 0.01ms;
+    transition-delay: 0ms;
+  }
+}
+
+/* Unlock method tabs, the same tray-and-block idea as the nav. */
+
+.sec-modes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0.25rem;
+  border-radius: 1rem;
+  background: var(--ink);
+}
+
+.sec-modes__blox {
+  position: absolute;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  width: calc((100% - 0.5rem) / 2);
+  border-radius: 0.75rem;
+  background: var(--violet);
+  translate: calc(var(--m) * 100%) 0;
+  transition: translate 480ms var(--ease-out-expo);
+}
+
+.sec-modes button {
+  position: relative;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  color: var(--paper-soft);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 200ms var(--ease-out-quart);
+}
+
+.sec-modes button[aria-selected="true"],
+.sec-modes button:hover {
+  color: var(--paper);
+}
+
+.sec-modes button:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: -3px;
+}
+
+/* Biometrics: a sensor you touch. The beam sweeps down, the ridges light up one by one, then it unlocks. */
+
+.sec-bio {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.875rem;
+  min-height: 16.75rem;
+}
+
+.sec-sensor {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 11rem;
+  aspect-ratio: 1;
+  overflow: clip;
+  border-radius: 50%;
+  background: var(--paper-deep);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 360ms var(--ease-out-quart),
+    scale 160ms var(--ease-out-quart);
+}
+
+.sec-sensor:active:not(:disabled) {
+  scale: 0.97;
+}
+
+.sec-sensor:disabled {
+  cursor: default;
+}
+
+.sec-sensor:focus-visible {
+  outline: 3px solid var(--violet);
+  outline-offset: 3px;
+}
+
+.sec-print {
+  width: 72%;
+  height: 72%;
+}
+
+.sec-ridge {
+  stroke: color-mix(in oklch, var(--ink) 24%, transparent);
+  transition: stroke 300ms var(--ease-out-quart) calc(var(--r) * 170ms);
+}
+
+.sec-sensor__beam {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 30%;
+  border-bottom: 2px solid var(--violet);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklch, var(--violet) 40%, transparent)
+  );
+  opacity: 0;
+  translate: 0 -100%;
+}
+
+.sec-sensor__pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 color-mix(in oklch, var(--violet) 55%, transparent);
+  opacity: 0;
+}
+
+.sec-bio[data-scan="scanning"] .sec-ridge,
+.sec-bio[data-scan="done"] .sec-ridge {
+  stroke: var(--violet);
+}
+
+.sec-bio[data-scan="scanning"] .sec-sensor__beam {
+  animation: sec-beam 1500ms linear;
+}
+
+.sec-bio[data-scan="done"] .sec-sensor {
+  background: var(--violet);
+}
+
+.sec-bio[data-scan="done"] .sec-ridge {
+  stroke: var(--paper);
+  transition-delay: 0ms;
+}
+
+.sec-bio[data-scan="done"] .sec-sensor__pulse {
+  animation: sec-pulse 900ms var(--ease-out-expo);
+}
+
+.sec-bio__hint {
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+@keyframes sec-beam {
+  0% {
+    opacity: 1;
+    translate: 0 -100%;
+  }
+
+  100% {
+    opacity: 1;
+    translate: 0 357%;
+  }
+}
+
+@keyframes sec-pulse {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--violet) 55%, transparent);
+  }
+
+  100% {
+    opacity: 0;
+    box-shadow: 0 0 0 2.5rem color-mix(in oklch, var(--violet) 0%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sec-bio[data-scan="scanning"] .sec-sensor__beam,
+  .sec-bio[data-scan="done"] .sec-sensor__pulse {
+    animation: none;
+  }
+
+  .sec-modes__blox,
+  .sec-modes button,
+  .sec-sensor,
+  .sec-ridge {
+    transition-duration: 0.01ms;
+    transition-delay: 0ms;
+  }
+}

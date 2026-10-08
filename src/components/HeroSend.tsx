@@ -2,14 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-
-// Sample values for the illustration. None of this is live data.
-const sample = {
-  id: "@adaeze",
-  name: "Adaeze Okonkwo",
-  firstName: "Adaeze",
-  amount: "₦25,000",
-};
+import { sample } from "@/lib/sample";
 
 export default function HeroSend() {
   const root = useRef<HTMLDivElement>(null);
@@ -20,9 +13,9 @@ export default function HeroSend() {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
       const id = el.querySelector<HTMLElement>(".send-card__id")!;
-      const typed = { chars: sample.id.length };
+      const typed = { chars: sample.bloxId.length };
       const write = () => {
-        id.textContent = sample.id.slice(0, Math.round(typed.chars));
+        id.textContent = sample.bloxId.slice(0, Math.round(typed.chars));
       };
       const clear = () => {
         typed.chars = 0;
@@ -48,9 +41,9 @@ export default function HeroSend() {
           typed,
           { chars: 0 },
           {
-            chars: sample.id.length,
+            chars: sample.bloxId.length,
             duration: 0.9,
-            ease: `steps(${sample.id.length})`,
+            ease: `steps(${sample.bloxId.length})`,
             immediateRender: false,
             onUpdate: write,
           },
@@ -131,12 +124,12 @@ export default function HeroSend() {
       ref={root}
       className="hero-send"
       role="img"
-      aria-label={`Example transfer: sending ${sample.amount} to the Blox ID ${sample.id}. The recipient's verified name, ${sample.name}, shows before you confirm.`}
+      aria-label={`Sending ${sample.amount} to the Blox ID ${sample.bloxId}. The recipient's verified name, ${sample.name}, shows before you confirm.`}
     >
       <div className="send-card">
         <p className="send-card__label">Send to a Blox ID</p>
         <p className="send-card__field">
-          <span className="send-card__id">{sample.id}</span>
+          <span className="send-card__id">{sample.bloxId}</span>
           <i className="send-card__caret" />
         </p>
         <p className="send-card__match">

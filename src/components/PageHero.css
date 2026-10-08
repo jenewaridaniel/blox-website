@@ -1,0 +1,142 @@
+/*
+ * The top of an inner page. A big block (ink or violet) with a big title, and labelled blocks drifting
+ * behind it. The chips are decoration only.
+ */
+
+.phero {
+  /* Starts just under the nav, like the home page's hero. */
+  padding: calc(var(--gutter) + 4rem) var(--gutter) 0;
+}
+
+.phero-panel {
+  --chip-a: var(--violet);
+  --chip-a-fg: var(--paper);
+  --chip-b: var(--paper);
+  --chip-b-fg: var(--ink);
+  --chip-c: var(--ink-raised);
+  --chip-c-fg: var(--paper);
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: center;
+  min-height: clamp(26rem, 64svh, 40rem);
+  padding: clamp(2rem, 5vw, 5rem) clamp(1.5rem, 4.4vw, 4.5rem);
+  overflow: clip;
+  border-radius: clamp(1.5rem, 2.6vw, 2.5rem);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.phero[data-tone="violet"] .phero-panel {
+  --chip-a: var(--ink);
+  --chip-c: var(--violet-deep);
+
+  background: var(--violet);
+}
+
+.phero-copy {
+  display: grid;
+  justify-items: start;
+  max-width: 44rem;
+}
+
+.phero-title {
+  font-size: clamp(3rem, 8.2vw, 8rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.phero-lead {
+  max-width: 38ch;
+  margin-top: clamp(1.25rem, 2vw, 1.75rem);
+  color: var(--paper-soft);
+  font-size: clamp(1.0625rem, 1.5vw, 1.375rem);
+  line-height: 1.5;
+}
+
+.phero[data-tone="violet"] .phero-lead {
+  color: var(--paper);
+}
+
+/* Background */
+
+.phero-bg {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+}
+
+.phero-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--paper) 22%, transparent) 1.5px,
+    transparent 1.75px
+  );
+  background-size: 1.75rem 1.75rem;
+  mask-image: radial-gradient(
+    ellipse 60% 85% at 85% 55%,
+    #000 0%,
+    transparent 100%
+  );
+}
+
+.phero-chip {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.875rem;
+  background: var(--chip-bg);
+  color: var(--chip-fg);
+  font-size: clamp(0.875rem, 1.1vw, 1rem);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  rotate: var(--r);
+  animation: phero-drift var(--t) cubic-bezier(0.65, 0, 0.35, 1) infinite
+    alternate;
+}
+
+.phero-chip[data-c="a"] {
+  --chip-bg: var(--chip-a);
+  --chip-fg: var(--chip-a-fg);
+}
+
+.phero-chip[data-c="b"] {
+  --chip-bg: var(--chip-b);
+  --chip-fg: var(--chip-b-fg);
+}
+
+.phero-chip[data-c="c"] {
+  --chip-bg: var(--chip-c);
+  --chip-fg: var(--chip-c-fg);
+}
+
+@keyframes phero-drift {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-1.5rem);
+  }
+}
+
+@media (width < 48rem) {
+  /* On a phone the title fills the block, so the chips would only sit behind the words. */
+  .phero-chip {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phero-chip {
+    animation: none;
+  }
+}

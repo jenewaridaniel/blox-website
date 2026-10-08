@@ -1,0 +1,413 @@
+/*
+ * Get the app. A violet block with the call to action, and a phone showing the wallet: balance,
+ * quick actions, assets, recent transactions. The phone is a picture of the app, with a balance you can
+ * hide and a notification that drops in now and then.
+ */
+
+.getapp {
+  padding: var(--gutter);
+}
+
+.getapp-panel {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+  align-items: center;
+  gap: 3rem clamp(2rem, 7vw, 8rem);
+  min-height: clamp(36rem, 90svh, 52rem);
+  padding: clamp(1.5rem, 4.4vw, 4.5rem);
+  overflow: clip;
+  border-radius: clamp(1.5rem, 2.6vw, 2.5rem);
+  background: var(--violet);
+  color: var(--paper);
+}
+
+/* Rings leave the phone the way they leave the hero's photo. The wrapper is out of the layout so it takes no grid cell. */
+.ga-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Rings leave the phone the way they leave the hero's photo. */
+.ga-bg i {
+  position: absolute;
+  top: 50%;
+  right: clamp(2rem, 12vw, 14rem);
+  z-index: -1;
+  width: min(30rem, 90vw);
+  aspect-ratio: 1;
+  border: 2px solid color-mix(in oklch, var(--paper) 55%, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  translate: 0 -50%;
+  animation: ga-ring 9s var(--ease-out-quart) infinite;
+}
+
+.ga-bg i:nth-child(2) {
+  animation-delay: 3s;
+}
+
+.ga-bg i:nth-child(3) {
+  animation-delay: 6s;
+}
+
+@keyframes ga-ring {
+  0% {
+    opacity: 0;
+    scale: 0.7;
+  }
+
+  14% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 3.2;
+  }
+}
+
+.getapp-copy {
+  display: grid;
+  justify-items: start;
+  max-width: 34rem;
+}
+
+.getapp-title {
+  font-size: clamp(2.75rem, 6.6vw, 6.5rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.getapp-sub {
+  max-width: 34ch;
+  margin-top: clamp(1.25rem, 2vw, 1.75rem);
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  line-height: 1.5;
+}
+
+.getapp-copy .block-btn {
+  margin-top: clamp(1.75rem, 2.8vw, 2.5rem);
+}
+
+.getapp-tag {
+  margin-top: 1.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.625rem;
+  background: var(--violet-deep);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* The phone */
+
+.getapp-stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+
+.ga-block {
+  position: absolute;
+  z-index: 2;
+  border-radius: 1.125rem;
+  animation: ga-float 9s cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
+}
+
+.ga-block--a {
+  top: 14%;
+  left: -2.5rem;
+  width: 4.5rem;
+  height: 4.5rem;
+  background: var(--paper);
+  rotate: -12deg;
+}
+
+.ga-block--b {
+  right: -1.5rem;
+  bottom: 18%;
+  width: 3.25rem;
+  height: 3.25rem;
+  background: var(--ink);
+  rotate: 14deg;
+  animation-delay: -4s;
+}
+
+@keyframes ga-float {
+  to {
+    transform: translateY(-1.25rem);
+  }
+}
+
+.phone {
+  position: relative;
+  width: min(100%, 21rem);
+  padding: 0.5rem;
+  border-radius: 2.5rem;
+  background: var(--ink);
+  box-shadow: 0 2rem 4rem -1rem color-mix(in oklch, var(--ink) 55%, transparent);
+  rotate: 3deg;
+  transition: rotate 700ms var(--ease-out-expo);
+}
+
+@media (hover: hover) {
+  .phone:hover {
+    rotate: 0deg;
+  }
+}
+
+.phone-screen {
+  position: relative;
+  display: grid;
+  gap: 0.875rem;
+  padding: 1.75rem 1rem 1rem;
+  overflow: clip;
+  border-radius: 2rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.phone-notch {
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  width: 4.5rem;
+  height: 0.875rem;
+  border-radius: 0.5rem;
+  background: var(--ink);
+  translate: -50% 0;
+}
+
+.ph-toast {
+  position: absolute;
+  z-index: 2;
+  top: 1.5rem;
+  right: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.875rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.875rem;
+  font-weight: 600;
+  opacity: 0;
+  translate: 0 -1.5rem;
+  transition:
+    opacity 360ms var(--ease-out-quart),
+    translate 520ms var(--ease-out-expo);
+}
+
+.ph-toast span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--violet);
+}
+
+.ph-toast[data-show] {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.ph-balance {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.875rem;
+  border-radius: 1.125rem;
+  background: var(--violet);
+  color: var(--paper);
+}
+
+.ph-balance span {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.ph-balance div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ph-balance strong {
+  font-size: 1.625rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.ph-balance button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  background: var(--violet-deep);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ph-balance button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.ph-balance button:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+}
+
+.ph-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem 0.25rem;
+}
+
+.ph-actions li {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.ph-actions li span {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  background: var(--paper-deep);
+  transition:
+    background-color 220ms var(--ease-out-quart),
+    color 220ms var(--ease-out-quart),
+    translate 220ms var(--ease-out-quart);
+}
+
+.ph-actions svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@media (hover: hover) {
+  .ph-actions li:hover span {
+    background: var(--ink);
+    color: var(--paper);
+    translate: 0 -0.1875rem;
+  }
+}
+
+.ph-assets,
+.ph-recent {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.ph-assets li,
+.ph-recent li {
+  display: grid;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.875rem;
+  background: var(--paper-deep);
+}
+
+.ph-assets li {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.ph-recent li {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.ph-assets li > span {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.625rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.ph-assets strong,
+.ph-recent strong {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ph-assets small,
+.ph-recent small {
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+}
+
+.ph-assets b,
+.ph-recent b {
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ph-heading {
+  margin-top: 0.125rem;
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+@media (width < 64rem) {
+  .getapp-panel {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    padding-inline: clamp(1.25rem, 6vw, 3.5rem);
+    padding-block: clamp(2rem, 8vw, 4rem);
+  }
+
+  .ga-block--a {
+    top: auto;
+    bottom: 6%;
+    left: -0.25rem;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .ga-bg i {
+    top: auto;
+    right: 50%;
+    bottom: 2rem;
+    translate: 50% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ga-bg i {
+    animation: none;
+    opacity: 0;
+  }
+
+  .ga-block {
+    animation: none;
+  }
+
+  .phone,
+  .ph-toast,
+  .ph-actions li span {
+    transition-duration: 0.01ms;
+  }
+}

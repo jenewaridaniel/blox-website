@@ -16,7 +16,7 @@ Blox is one account for Naira and crypto. Tagline: "Naira and crypto. One simple
 
 What the app does:
 
-- Account: sign up, KYC, a unique Blox ID per user, transaction PIN, biometrics, OTP/2FA.
+- Account: sign up, KYC, a unique Blox ID per user (an eight-digit number that can be copied and shared, and is what people send to), transaction PIN, biometrics, OTP/2FA.
 - Wallet: Naira balance plus several crypto assets, with quick actions (Buy, Sell, Send, Receive, Swap, Airtime, Data).
 - Send and receive: Blox to Blox by Blox ID, instant, with the recipient's verified name shown before you confirm. Also external crypto addresses, with QR and network warnings.
 - Crypto: buy, sell and swap. Rate, fees and the amount you get are shown before you confirm. Deposits and withdrawals carry clear statuses.
